@@ -3,111 +3,181 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dicky News | YouTube Task Unlocker</title>
+    <title>Dicky News | Premium Unlocker</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
         :root {
-            --bg: #050505;
-            --accent: #ff0000;
-            --text: #ffffff;
-            --success: #00ff88;
-            --warning: #ffcc00;
+            --glass: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.4);
+            --accent: #007AFF; /* iOS Blue */
+            --yt-red: #FF3B30; /* iOS Red */
+            --success: #34C759; /* iOS Green */
+            --warning: #FF9500; /* iOS Orange */
+            --text: #1d1d1f;
         }
 
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
         body {
-            margin: 0; background: var(--bg); color: var(--text);
-            font-family: 'Segoe UI', sans-serif; height: 100vh;
-            display: flex; align-items: center; justify-content: center;
-            background: radial-gradient(circle at 50% 50%, #1a0000 0%, #000 100%);
+            margin: 0; padding: 0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            height: 100vh; display: flex; align-items: center; justify-content: center;
+            overflow: hidden; color: var(--text);
+            background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
+        }
+
+        /* Animated Space Background */
+        #space-canvas {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
         }
 
         .card {
-            width: 90%; max-width: 360px;
-            background: rgba(255,255,255,0.03); backdrop-filter: blur(15px);
-            padding: 35px 25px; border-radius: 25px;
-            border: 1px solid rgba(255,255,255,0.1);
+            width: 90%; max-width: 380px;
+            background: var(--glass);
+            backdrop-filter: blur(25px) saturate(180%);
+            -webkit-backdrop-filter: blur(25px) saturate(180%);
+            padding: 40px 25px;
+            border-radius: 35px;
+            border: 1px solid var(--glass-border);
             text-align: center;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+            animation: floating 6s ease-in-out infinite;
+            z-index: 10;
         }
 
-        .icon-box { font-size: 50px; color: var(--accent); margin-bottom: 15px; }
-        h2 { font-size: 16px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
-        p.desc { font-size: 13px; color: #bbb; margin-bottom: 25px; padding: 0 10px; }
-
-        input {
-            width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333;
-            background: #000; color: #fff; margin-bottom: 15px; outline: none; box-sizing: border-box;
+        @keyframes floating {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-15px); }
         }
+
+        .icon-wrapper {
+            width: 80px; height: 80px;
+            background: white; border-radius: 22px;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 20px;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+            font-size: 40px; color: var(--yt-red);
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.4); }
+            70% { transform: scale(1.05); box-shadow: 0 0 0 15px rgba(255, 59, 48, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
+        }
+
+        h2 { font-size: 22px; font-weight: 700; margin: 10px 0; letter-spacing: -0.5px; }
+        p.desc { font-size: 15px; color: #444; line-height: 1.5; margin-bottom: 30px; }
 
         .btn {
-            width: 100%; padding: 15px; border-radius: 12px; border: none;
-            font-weight: bold; cursor: pointer; transition: 0.3s;
-            text-transform: uppercase; font-size: 14px;
+            width: 100%; padding: 18px; border-radius: 18px; border: none;
+            font-weight: 600; font-size: 16px; cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex; align-items: center; justify-content: center; gap: 10px;
         }
 
-        .btn-gen { background: #fff; color: #000; }
-        .btn-unlock { background: var(--accent); color: #fff; }
-        .btn-waiting { background: #222; color: #888; cursor: wait; border: 1px solid #444; }
-        .btn-retry { background: var(--warning); color: #000; }
-        .btn-done { background: var(--success); color: #000; box-shadow: 0 0 15px var(--success); }
+        .btn:active { transform: scale(0.95); }
 
-        #resultArea { 
-            margin-top: 20px; padding: 10px; border: 1px dashed #555; 
-            border-radius: 10px; font-size: 11px; word-break: break-all; cursor: pointer;
+        .btn-unlock { background: var(--text); color: white; }
+        .btn-waiting { background: rgba(0,0,0,0.1); color: #666; cursor: wait; }
+        .btn-retry { background: var(--warning); color: white; }
+        .btn-done { background: var(--success); color: white; }
+
+        input {
+            width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(0,0,0,0.1);
+            background: rgba(255,255,255,0.5); margin-bottom: 15px; font-size: 14px; outline: none;
         }
 
-        #statusMsg { font-size: 12px; margin-top: 15px; min-height: 18px; }
+        #statusMsg { font-size: 13px; margin-top: 20px; font-weight: 500; height: 20px; transition: 0.3s; }
+
+        #resultArea {
+            margin-top: 20px; padding: 15px; background: white; border-radius: 12px;
+            font-size: 11px; word-break: break-all; border: 1px dashed #ccc; cursor: copy;
+        }
     </style>
 </head>
 <body>
 
+<canvas id="space-canvas"></canvas>
+
 <div class="card" id="card"></div>
 
 <script>
+    // --- SPACE BACKGROUND ENGINE ---
+    const canvas = document.getElementById('space-canvas');
+    const ctx = canvas.getContext('2d');
+    let particles = [];
+
+    function initCanvas() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        particles = [];
+        for (let i = 0; i < 100; i++) {
+            particles.push({
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height,
+                radius: Math.random() * 2,
+                speed: Math.random() * 0.5 + 0.1
+            });
+        }
+    }
+
+    function drawParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.fillStyle = "rgba(255, 255, 255, 0.5)";
+        particles.forEach(p => {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.radius, 0, Math.PI * 2);
+            ctx.fill();
+            p.y -= p.speed;
+            if (p.y < 0) p.y = canvas.height;
+        });
+        requestAnimationFrame(drawParticles);
+    }
+    window.addEventListener('resize', initCanvas);
+    initCanvas();
+    drawParticles();
+
+    // --- LOGIC ---
     const params = new URLSearchParams(window.location.search);
     const box = document.getElementById('card');
-    const FINAL_LINK = "https://dickynews.github.io/download/"; // Link tujuan akhir
+    const FINAL_LINK = "https://dickynews.github.io/download/";
     let attempt = 1;
 
-    // --- 1. MODE GENERATOR ---
     if (!params.get("v")) {
         box.innerHTML = `
-            <div class="icon-box"><i class="fas fa-link"></i></div>
-            <h2>BUAT LINK MISI</h2>
-            <input type="text" id="linkInp" placeholder="Masukkan Link Video YouTube...">
-            <button class="btn btn-gen" onclick="generate()">GENERATE</button>
+            <div class="icon-wrapper" style="color:var(--accent)"><i class="fas fa-plus"></i></div>
+            <h2>Buat Link Tugas</h2>
+            <input type="text" id="linkInp" placeholder="Paste link YouTube di sini...">
+            <button class="btn btn-unlock" onclick="generate()">Generate Link</button>
             <div id="resultArea" style="display:none" onclick="copy()"></div>
         `;
 
         window.generate = () => {
             const val = document.getElementById('linkInp').value;
-            if(!val) return alert("Masukkan link dulu!");
+            if(!val) return;
             const encoded = btoa(val).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
             const final = window.location.origin + window.location.pathname + "?v=" + encoded;
             const res = document.getElementById('resultArea');
-            res.innerText = final;
-            res.style.display = 'block';
-            alert("Berhasil! Klik kotak di bawah untuk copy.");
+            res.innerText = final; res.style.display = 'block';
         }
 
         window.copy = () => {
             navigator.clipboard.writeText(document.getElementById('resultArea').innerText);
-            alert("Link disalin!");
+            alert("Tersalin!");
         }
     } 
-
-    // --- 2. MODE UNLOCKER ---
     else {
         const ytTarget = atob(params.get("v").replace(/-/g, '+').replace(/_/g, '/'));
         
         box.innerHTML = `
-            <div class="icon-box"><i class="fab fa-youtube"></i></div>
-            <h2>VERIFIKASI TUGAS</h2>
-            <p class="desc" id="instruction">Silahkan <b>Like & Berikan Komentar</b> pada video berikut agar link terbuka.</p>
+            <div class="icon-wrapper"><i class="fab fa-youtube"></i></div>
+            <h2>Verifikasi Video</h2>
+            <p class="desc">Silahkan <b>Like & Berikan komentar</b> pada video YouTube untuk membuka link tujuan.</p>
             <button id="btnAction" class="btn btn-unlock" onclick="handleMission('${ytTarget}')">
-                MULAI MISI
+                MULAI TUGAS
             </button>
             <div id="statusMsg"></div>
         `;
@@ -116,43 +186,33 @@
             const btn = document.getElementById('btnAction');
             const status = document.getElementById('statusMsg');
 
-            // Buka tab YouTube
             window.open(videoLink, "_blank");
 
-            // Setup Timer
             btn.disabled = true;
             btn.className = "btn btn-waiting";
-            status.innerText = "Mengecek interaksi...";
+            status.innerText = "Memverifikasi interaksi...";
             status.style.color = "#888";
             
             let time = 15;
             const timer = setInterval(() => {
-                btn.innerText = `PROSES... ${time}s`;
+                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Mengecek ${time}s`;
                 time--;
 
                 if(time < 0) {
                     clearInterval(timer);
-                    
                     if(attempt === 1) {
-                        // Gagalkan percobaan pertama
                         btn.disabled = false;
                         btn.className = "btn btn-retry";
-                        btn.innerText = "ULANGI MISI";
-                        status.innerText = "Gagal: Interaksi tidak ditemukan. Silahkan Like & Komen dengan benar.";
+                        btn.innerText = "ULANGI TUGAS";
+                        status.innerText = "Interaksi tidak ditemukan, coba lagi.";
                         status.style.color = "var(--warning)";
                         attempt = 2;
                     } else {
-                        // Berhasil pada percobaan kedua
-                        btn.disabled = true;
                         btn.className = "btn btn-done";
-                        btn.innerText = "VERIFIKASI BERHASIL!";
-                        status.innerText = "Tugas selesai! Mengalihkan ke link download...";
+                        btn.innerHTML = `<i class="fas fa-check-circle"></i> BERHASIL`;
+                        status.innerText = "Tugas selesai! Mengalihkan...";
                         status.style.color = "var(--success)";
-                        
-                        // Redirect ke link download setelah 2 detik
-                        setTimeout(() => {
-                            window.location.href = FINAL_LINK;
-                        }, 2000);
+                        setTimeout(() => { window.location.href = FINAL_LINK; }, 2000);
                     }
                 }
             }, 1000);
