@@ -58,7 +58,7 @@
             border-radius: 10px; font-size: 11px; word-break: break-all; cursor: pointer;
         }
 
-        .status-msg { font-size: 12px; margin-top: 15px; color: var(--accent); display: none; }
+        #statusMsg { font-size: 12px; margin-top: 15px; min-height: 18px; }
     </style>
 </head>
 <body>
@@ -68,7 +68,8 @@
 <script>
     const params = new URLSearchParams(window.location.search);
     const box = document.getElementById('card');
-    let attempt = 1; // Variabel untuk melacak jumlah percobaan klik
+    const FINAL_LINK = "https://dickynews.github.io/download/"; // Link tujuan akhir
+    let attempt = 1;
 
     // --- 1. MODE GENERATOR ---
     if (!params.get("v")) {
@@ -101,60 +102,56 @@
     else {
         const ytTarget = atob(params.get("v").replace(/-/g, '+').replace(/_/g, '/'));
         
-        const renderUnlocker = () => {
-            box.innerHTML = `
-                <div class="icon-box"><i class="fab fa-youtube"></i></div>
-                <h2 id="mainTitle">VERIFIKASI TUGAS</h2>
-                <p class="desc" id="instruction">Silahkan <b>Like & Berikan Komentar</b> pada video berikut agar link terbuka.</p>
-                <button id="btnAction" class="btn btn-unlock" onclick="handleMission('${ytTarget}')">
-                    MULAI MISI
-                </button>
-                <div id="statusMsg" class="status-msg"></div>
-            `;
-        }
+        box.innerHTML = `
+            <div class="icon-box"><i class="fab fa-youtube"></i></div>
+            <h2>VERIFIKASI TUGAS</h2>
+            <p class="desc" id="instruction">Silahkan <b>Like & Berikan Komentar</b> pada video berikut agar link terbuka.</p>
+            <button id="btnAction" class="btn btn-unlock" onclick="handleMission('${ytTarget}')">
+                MULAI MISI
+            </button>
+            <div id="statusMsg"></div>
+        `;
 
-        renderUnlocker();
-
-        window.handleMission = (link) => {
+        window.handleMission = (videoLink) => {
             const btn = document.getElementById('btnAction');
             const status = document.getElementById('statusMsg');
-            const instruction = document.getElementById('instruction');
 
-            // Buka link YouTube di tab baru
-            window.open(link, "_blank");
+            // Buka tab YouTube
+            window.open(videoLink, "_blank");
 
             // Setup Timer
             btn.disabled = true;
             btn.className = "btn btn-waiting";
-            status.style.display = "block";
+            status.innerText = "Mengecek interaksi...";
             status.style.color = "#888";
             
             let time = 15;
             const timer = setInterval(() => {
-                btn.innerText = `MENGECEK... ${time}s`;
+                btn.innerText = `PROSES... ${time}s`;
                 time--;
 
                 if(time < 0) {
                     clearInterval(timer);
                     
                     if(attempt === 1) {
-                        // Gagal pada percobaan pertama
+                        // Gagalkan percobaan pertama
                         btn.disabled = false;
                         btn.className = "btn btn-retry";
-                        btn.innerText = "COBA LAGI";
-                        status.innerText = "Gagal: Interaksi (Like/Komen) tidak terdeteksi. Silahkan ulangi.";
-                        status.style.color = "var(--accent)";
+                        btn.innerText = "ULANGI MISI";
+                        status.innerText = "Gagal: Interaksi tidak ditemukan. Silahkan Like & Komen dengan benar.";
+                        status.style.color = "var(--warning)";
                         attempt = 2;
                     } else {
                         // Berhasil pada percobaan kedua
-                        btn.disabled = false;
+                        btn.disabled = true;
                         btn.className = "btn btn-done";
                         btn.innerText = "VERIFIKASI BERHASIL!";
-                        status.innerText = "Tugas selesai! Membuka link...";
+                        status.innerText = "Tugas selesai! Mengalihkan ke link download...";
                         status.style.color = "var(--success)";
                         
+                        // Redirect ke link download setelah 2 detik
                         setTimeout(() => {
-                            window.location.href = link; // Redirect ke link tujuan
+                            window.location.href = FINAL_LINK;
                         }, 2000);
                     }
                 }
