@@ -13,6 +13,7 @@
             --accent: #ff0000;
             --text: #ffffff;
             --success: #00ff88;
+            --warning: #ffcc00;
         }
 
         body {
@@ -28,40 +29,46 @@
             padding: 35px 25px; border-radius: 25px;
             border: 1px solid rgba(255,255,255,0.1);
             text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
         .icon-box { font-size: 50px; color: var(--accent); margin-bottom: 15px; }
-        h2 { font-size: 16px; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px; }
+        h2 { font-size: 16px; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; line-height: 1.4; }
+        p.desc { font-size: 13px; color: #bbb; margin-bottom: 25px; padding: 0 10px; }
 
         input {
             width: 100%; padding: 12px; border-radius: 10px; border: 1px solid #333;
-            background: #000; color: #fff; margin-bottom: 15px; outline: none;
+            background: #000; color: #fff; margin-bottom: 15px; outline: none; box-sizing: border-box;
         }
 
         .btn {
             width: 100%; padding: 15px; border-radius: 12px; border: none;
             font-weight: bold; cursor: pointer; transition: 0.3s;
+            text-transform: uppercase; font-size: 14px;
         }
 
         .btn-gen { background: #fff; color: #000; }
         .btn-unlock { background: var(--accent); color: #fff; }
-        .btn-waiting { background: #222; color: #666; cursor: wait; }
+        .btn-waiting { background: #222; color: #888; cursor: wait; border: 1px solid #444; }
+        .btn-retry { background: var(--warning); color: #000; }
         .btn-done { background: var(--success); color: #000; box-shadow: 0 0 15px var(--success); }
 
         #resultArea { 
             margin-top: 20px; padding: 10px; border: 1px dashed #555; 
             border-radius: 10px; font-size: 11px; word-break: break-all; cursor: pointer;
         }
+
+        .status-msg { font-size: 12px; margin-top: 15px; color: var(--accent); display: none; }
     </style>
 </head>
 <body>
 
-<div class="card" id="card">
-    </div>
+<div class="card" id="card"></div>
 
 <script>
     const params = new URLSearchParams(window.location.search);
     const box = document.getElementById('card');
+    let attempt = 1; // Variabel untuk melacak jumlah percobaan klik
 
     // --- 1. MODE GENERATOR ---
     if (!params.get("v")) {
@@ -93,21 +100,34 @@
     // --- 2. MODE UNLOCKER ---
     else {
         const ytTarget = atob(params.get("v").replace(/-/g, '+').replace(/_/g, '/'));
-        box.innerHTML = `
-            <div class="icon-box"><i class="fab fa-youtube"></i></div>
-            <h2>MISI LIKE & KOMEN</h2>
-            <p style="font-size:12px; color:#888; margin-bottom:20px;">Link akan terbuka otomatis setelah 15 detik misi berjalan.</p>
-            <button id="btnAction" class="btn btn-unlock" onclick="startMisi('${ytTarget}')">
-                MULAI MISI
-            </button>
-        `;
+        
+        const renderUnlocker = () => {
+            box.innerHTML = `
+                <div class="icon-box"><i class="fab fa-youtube"></i></div>
+                <h2 id="mainTitle">VERIFIKASI TUGAS</h2>
+                <p class="desc" id="instruction">Silahkan <b>Like & Berikan Komentar</b> pada video berikut agar link terbuka.</p>
+                <button id="btnAction" class="btn btn-unlock" onclick="handleMission('${ytTarget}')">
+                    MULAI MISI
+                </button>
+                <div id="statusMsg" class="status-msg"></div>
+            `;
+        }
 
-        window.startMisi = (link) => {
+        renderUnlocker();
+
+        window.handleMission = (link) => {
             const btn = document.getElementById('btnAction');
+            const status = document.getElementById('statusMsg');
+            const instruction = document.getElementById('instruction');
+
+            // Buka link YouTube di tab baru
             window.open(link, "_blank");
 
+            // Setup Timer
             btn.disabled = true;
             btn.className = "btn btn-waiting";
+            status.style.display = "block";
+            status.style.color = "#888";
             
             let time = 15;
             const timer = setInterval(() => {
@@ -116,11 +136,27 @@
 
                 if(time < 0) {
                     clearInterval(timer);
-                    btn.disabled = false;
-                    btn.className = "btn btn-done";
-                    btn.innerText = "MISI SELESAI!";
-                    // Setelah selesai, bisa diarahkan balik ke video atau pesan sukses
-                    btn.onclick = () => alert("Misi Selesai! Terima kasih dukungannya.");
+                    
+                    if(attempt === 1) {
+                        // Gagal pada percobaan pertama
+                        btn.disabled = false;
+                        btn.className = "btn btn-retry";
+                        btn.innerText = "COBA LAGI";
+                        status.innerText = "Gagal: Interaksi (Like/Komen) tidak terdeteksi. Silahkan ulangi.";
+                        status.style.color = "var(--accent)";
+                        attempt = 2;
+                    } else {
+                        // Berhasil pada percobaan kedua
+                        btn.disabled = false;
+                        btn.className = "btn btn-done";
+                        btn.innerText = "VERIFIKASI BERHASIL!";
+                        status.innerText = "Tugas selesai! Membuka link...";
+                        status.style.color = "var(--success)";
+                        
+                        setTimeout(() => {
+                            window.location.href = link; // Redirect ke link tujuan
+                        }, 2000);
+                    }
                 }
             }, 1000);
         }
