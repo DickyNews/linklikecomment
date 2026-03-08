@@ -84,9 +84,10 @@
 
         .btn {
             width: 100%; padding: 18px; border-radius: 18px; border: none;
-            font-weight: 600; font-size: 16px; cursor: pointer;
+            font-weight: 600; font-size: 14px; cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             display: flex; align-items: center; justify-content: center; gap: 10px;
+            text-transform: uppercase;
         }
 
         .btn:active { transform: scale(0.95); }
@@ -220,7 +221,7 @@
                     if(attempt === 1) {
                         btn.disabled = false;
                         btn.className = "btn btn-retry pulse-btn";
-                        btn.innerText = "ULANGI TUGAS";
+                        btn.innerText = "KLIK TOMBOL INI UNTUK ULANGI TUGAS";
                         status.innerHTML = "Sistem menemukan kamu belum like & comment, <b>silahkan klik tombol ini untuk mengulang tugas</b>.";
                         status.style.color = "var(--yt-red)";
                         attempt = 2;
