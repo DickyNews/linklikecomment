@@ -68,6 +68,11 @@
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
         }
 
+        /* Denyut untuk tombol retry */
+        .pulse-btn {
+            animation: pulse 1.5s infinite;
+        }
+
         h2 { font-size: 22px; font-weight: 700; margin: 10px 0; letter-spacing: -0.5px; }
         p.desc { font-size: 15px; color: #444; line-height: 1.5; margin-bottom: 30px; }
 
@@ -90,7 +95,7 @@
             background: rgba(255,255,255,0.5); margin-bottom: 15px; font-size: 14px; outline: none;
         }
 
-        #statusMsg { font-size: 13px; margin-top: 20px; font-weight: 500; height: 20px; transition: 0.3s; }
+        #statusMsg { font-size: 13px; margin-top: 20px; font-weight: 500; height: auto; transition: 0.3s; }
 
         #resultArea {
             margin-top: 20px; padding: 15px; background: white; border-radius: 12px;
@@ -208,9 +213,9 @@
                     clearInterval(timer);
                     if(attempt === 1) {
                         btn.disabled = false;
-                        btn.className = "btn btn-retry";
+                        btn.className = "btn btn-retry pulse-btn";
                         btn.innerText = "ULANGI TUGAS";
-                        status.innerText = "Interaksi tidak ditemukan, coba lagi.";
+                        status.innerHTML = "Sistem menemukan kamu belum like & comment, <b>silahkan klik tombol ini untuk mengulang tugas</b>.";
                         status.style.color = "var(--warning)";
                         attempt = 2;
                     } else {
