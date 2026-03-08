@@ -151,14 +151,18 @@
             <div class="icon-wrapper" style="color:var(--accent)"><i class="fas fa-plus"></i></div>
             <h2>Buat Link Tugas</h2>
             <input type="text" id="linkInp" placeholder="Paste link YouTube di sini...">
+            <input type="number" id="pinInp" placeholder="Set PIN 4 Digit" maxlength="4">
             <button class="btn btn-unlock" onclick="generate()">Generate Link</button>
             <div id="resultArea" style="display:none" onclick="copy()"></div>
         `;
 
         window.generate = () => {
             const val = document.getElementById('linkInp').value;
-            if(!val) return;
-            const encoded = btoa(val).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+            const pin = document.getElementById('pinInp').value;
+            if(!val || !pin || pin.length !== 4) { alert("Isi link dan PIN 4 digit!"); return; }
+            
+            const data = JSON.stringify({ l: val, p: pin });
+            const encoded = btoa(data).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
             const final = window.location.origin + window.location.pathname + "?v=" + encoded;
             const res = document.getElementById('resultArea');
             res.innerText = final; res.style.display = 'block';
@@ -170,19 +174,21 @@
         }
     } 
     else {
-        const ytTarget = atob(params.get("v").replace(/-/g, '+').replace(/_/g, '/'));
+        const decoded = JSON.parse(atob(params.get("v").replace(/-/g, '+').replace(/_/g, '/')));
+        const ytTarget = decoded.l;
+        const requiredPin = decoded.p;
         
         box.innerHTML = `
             <div class="icon-wrapper"><i class="fab fa-youtube"></i></div>
             <h2>Verifikasi Video</h2>
             <p class="desc">Silahkan <b>Like & Berikan komentar</b> pada video YouTube untuk membuka link tujuan.</p>
-            <button id="btnAction" class="btn btn-unlock" onclick="handleMission('${ytTarget}')">
+            <button id="btnAction" class="btn btn-unlock" onclick="handleMission('${ytTarget}', '${requiredPin}')">
                 MULAI TUGAS
             </button>
             <div id="statusMsg"></div>
         `;
 
-        window.handleMission = (videoLink) => {
+        window.handleMission = (videoLink, reqPin) => {
             const btn = document.getElementById('btnAction');
             const status = document.getElementById('statusMsg');
 
@@ -208,14 +214,27 @@
                         status.style.color = "var(--warning)";
                         attempt = 2;
                     } else {
-                        btn.className = "btn btn-done";
-                        btn.innerHTML = `<i class="fas fa-check-circle"></i> BERHASIL`;
-                        status.innerText = "Tugas selesai! Mengalihkan...";
-                        status.style.color = "var(--success)";
-                        setTimeout(() => { window.location.href = FINAL_LINK; }, 2000);
+                        btn.style.display = "none";
+                        status.innerHTML = `
+                            <input type="number" id="pinInput" placeholder="Masukkan PIN 4 Digit" maxlength="4">
+                            <button class="btn btn-unlock" onclick="verifyPin('${reqPin}')">BUKA LINK</button>
+                        `;
+                        status.style.color = "var(--text)";
                     }
                 }
             }, 1000);
+        }
+
+        window.verifyPin = (reqPin) => {
+            const input = document.getElementById('pinInput').value;
+            const status = document.getElementById('statusMsg');
+            if(input === reqPin) {
+                status.innerText = "Berhasil! Mengalihkan...";
+                status.style.color = "var(--success)";
+                setTimeout(() => { window.location.href = FINAL_LINK; }, 1500);
+            } else {
+                alert("PIN Salah!");
+            }
         }
     }
 </script>
