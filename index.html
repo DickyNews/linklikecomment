@@ -143,15 +143,15 @@
         box.innerHTML = `
             <div class="icon-wrapper"><i class="fas fa-lock"></i></div>
             <h2>Unlock Access</h2>
-            <p class="desc">Masukkan password VIP atau jalankan tugas untuk akses gratis.</p>
+            <p class="desc">KAMU BISA PILIH OPSI PASSWORD UNTUK LANGSUNG KE MEDIAFIRE atau KAMU JUGA BISA PILIH OPSI TANPA PASSWORD</p>
             
             <div id="mainUI">
-                <input type="text" id="inputPass" placeholder="MASUKKAN PASSWORD UNTUK LANGSUNG KE MEDIAFIRE">
-                <button class="btn btn-black" onclick="checkPassword('${data.ps}')">UNLOCK DENGAN PASSWORD</button>
+                <input type="text" id="inputPass" placeholder="masukkan password...">
+                <button class="btn btn-black" onclick="checkPassword('${data.ps}')">UNLOCK LINK DENGAN PASSWORD</button>
                 
                 <div class="divider">ATAU</div>
                 
-                <button id="btnTask" class="btn btn-red" onclick="startTask('${data.yt}')">SILAHKAN BERIKAN LIKE & KOMENTAR PADA VIDEO BERIKUT (TANPA PASSWORD)</button>
+                <button id="btnTask" class="btn btn-red" onclick="startTask('${data.yt}')">UNLOCK LINK DENGAN BERIKAN LIKE & KOMENTAR PADA VIDEO BERIKUT (TANPA PASSWORD)</button>
             </div>
             <div id="statusMsg"></div>
         `;
