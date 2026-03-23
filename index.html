@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Dicky News | Premium Gatekeeper</title>
+    <title>Dicky News | WEB 3</title>
     
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
@@ -146,12 +146,12 @@
             <p class="desc">Masukkan password VIP atau jalankan tugas untuk akses gratis.</p>
             
             <div id="mainUI">
-                <input type="text" id="inputPass" placeholder="Masukkan Password VIP...">
+                <input type="text" id="inputPass" placeholder="MASUKKAN PASSWORD UNTUK LANGSUNG KE MEDIAFIRE">
                 <button class="btn btn-black" onclick="checkPassword('${data.ps}')">UNLOCK DENGAN PASSWORD</button>
                 
                 <div class="divider">ATAU</div>
                 
-                <button id="btnTask" class="btn btn-red" onclick="startTask('${data.yt}')">MULAI TUGAS (FREE)</button>
+                <button id="btnTask" class="btn btn-red" onclick="startTask('${data.yt}')">SILAHKAN BERIKAN LIKE & KOMENTAR PADA VIDEO BERIKUT (TANPA PASSWORD)</button>
             </div>
             <div id="statusMsg"></div>
         `;
@@ -163,7 +163,7 @@
                 // KIRIM SINYAL BYPASS KE WEB 1
                 goDestination(true);
             } else {
-                alert("Password Salah! Silakan cek deskripsi/komentar video.");
+                alert("Password Salah! SILAKAN SIMAK VIDEO.");
             }
         }
 
@@ -185,8 +185,8 @@
                     if(attempt === 1) {
                         btn.disabled = false;
                         btn.className = "btn btn-red";
-                        btn.innerText = "KLIK ULANG KONFIRMASI";
-                        status.innerHTML = "<b style='color:red'>Gagal!</b> Silakan klik ulang untuk validasi.";
+                        btn.innerText = "KLIK ULANG UNTUK LIKE & COMMENT";
+                        status.innerHTML = "<b style='color:red'>Gagal!</b> SILAKAN KLIK ULANG UNTUK BERIKAN LIKE & COMMENT.";
                         attempt = 2;
                     } else {
                         btn.className = "btn btn-success";
