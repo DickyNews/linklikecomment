@@ -11,10 +11,10 @@
         :root {
             --glass: rgba(255, 255, 255, 0.7);
             --glass-border: rgba(255, 255, 255, 0.4);
-            --accent: #007AFF; /* iOS Blue */
-            --yt-red: #FF3B30; /* iOS Red */
-            --success: #34C759; /* iOS Green */
-            --warning: #FF9500; /* iOS Orange */
+            --accent: #007AFF; 
+            --yt-red: #FF3B30; 
+            --success: #34C759; 
+            --warning: #FF9500; 
             --text: #1d1d1f;
         }
 
@@ -28,7 +28,6 @@
             background: linear-gradient(135deg, #e0c3fc 0%, #8ec5fc 100%);
         }
 
-        /* Animated Space Background */
         #space-canvas {
             position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
         }
@@ -68,10 +67,7 @@
             100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0); }
         }
 
-        /* Efek Denyut Tombol Merah */
-        .pulse-btn {
-            animation: pulse-red 1.5s infinite;
-        }
+        .pulse-btn { animation: pulse-red 1.5s infinite; }
 
         @keyframes pulse-red {
             0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(255, 59, 48, 0.5); }
@@ -80,7 +76,7 @@
         }
 
         h2 { font-size: 22px; font-weight: 700; margin: 10px 0; letter-spacing: -0.5px; }
-        p.desc { font-size: 15px; color: #444; line-height: 1.5; margin-bottom: 30px; }
+        p.desc { font-size: 14px; color: #444; line-height: 1.5; margin-bottom: 30px; }
 
         .btn {
             width: 100%; padding: 18px; border-radius: 18px; border: none;
@@ -91,15 +87,14 @@
         }
 
         .btn:active { transform: scale(0.95); }
-
         .btn-unlock { background: var(--text); color: white; }
         .btn-waiting { background: rgba(0,0,0,0.1); color: #666; cursor: wait; }
         .btn-retry { background: var(--yt-red); color: white; }
-        .btn-done { background: var(--success); color: white; }
 
         input {
             width: 100%; padding: 15px; border-radius: 15px; border: 1px solid rgba(0,0,0,0.1);
             background: rgba(255,255,255,0.5); margin-bottom: 15px; font-size: 14px; outline: none;
+            text-align: center; font-weight: bold; letter-spacing: 2px;
         }
 
         #statusMsg { font-size: 13px; margin-top: 20px; font-weight: 500; height: auto; transition: 0.3s; }
@@ -152,20 +147,25 @@
     initCanvas();
     drawParticles();
 
-    // --- LOGIC ---
+    // --- LOGIC GATEKEEPER ---
     const params = new URLSearchParams(window.location.search);
     const box = document.getElementById('card');
-    const FINAL_LINK = "https://dickynews.github.io/download/";
+    
+    // Alamat Web 2 kamu (Unlocker Utama)
+    const WEB_2_URL = "https://dickynews.github.io/linkdickynews/";
+
     let attempt = 1;
 
     if (!params.get("v")) {
+        // --- MODE GENERATOR ---
         box.innerHTML = `
             <div class="icon-wrapper" style="color:var(--accent)"><i class="fas fa-plus"></i></div>
             <h2>Buat Link Tugas</h2>
-            <input type="text" id="linkInp" placeholder="Paste link YouTube di sini...">
+            <input type="text" id="linkInp" placeholder="Link Web 2 / Link Download...">
             <input type="number" id="pinInp" placeholder="Set PIN 4 Digit" maxlength="4">
             <button class="btn btn-unlock" onclick="generate()">Generate Link</button>
             <div id="resultArea" style="display:none" onclick="copy()"></div>
+            <p style="font-size:10px; margin-top:10px; color:#666;">*Jika targetnya Web 2, otomatis bypass misi di sana.</p>
         `;
 
         window.generate = () => {
@@ -186,30 +186,32 @@
         }
     } 
     else {
+        // --- MODE VERIFIKASI ---
         const decoded = JSON.parse(atob(params.get("v").replace(/-/g, '+').replace(/_/g, '/')));
-        const ytTarget = decoded.l;
+        const targetLink = decoded.l;
         const requiredPin = decoded.p;
         
         box.innerHTML = `
             <div class="icon-wrapper"><i class="fab fa-youtube"></i></div>
             <h2>Verifikasi Video</h2>
-            <p class="desc">Silahkan <b>Like & Berikan komentar</b> pada video YouTube untuk membuka link tujuan.</p>
-            <button id="btnAction" class="btn btn-unlock" onclick="handleMission('${ytTarget}', '${requiredPin}')">
+            <p class="desc">Silahkan <b>Tonton, Like & Comment</b> pada video di YouTube untuk mendapatkan PIN pembuka.</p>
+            <button id="btnAction" class="btn btn-unlock" onclick="handleMission()">
                 MULAI TUGAS
             </button>
             <div id="statusMsg"></div>
         `;
 
-        window.handleMission = (videoLink, reqPin) => {
+        window.handleMission = () => {
             const btn = document.getElementById('btnAction');
             const status = document.getElementById('statusMsg');
 
-            window.open(videoLink, "_blank");
+            // Buka video YT (Asumsikan link yang di-generate adalah link video YT)
+            // Atau jika targetLink adalah video, kita buka targetLink.
+            window.open("https://youtube.com/@dickynews", "_blank"); 
 
             btn.disabled = true;
             btn.className = "btn btn-waiting";
             status.innerText = "Memverifikasi interaksi...";
-            status.style.color = "#888";
             
             let time = 15;
             const timer = setInterval(() => {
@@ -221,31 +223,38 @@
                     if(attempt === 1) {
                         btn.disabled = false;
                         btn.className = "btn btn-retry pulse-btn";
-                        btn.innerText = "KLIK TOMBOL INI UNTUK ULANGI TUGAS";
-                        status.innerHTML = "Sistem menemukan kamu belum like & comment, <b>silahkan klik tombol ini untuk mengulang tugas</b>.";
-                        status.style.color = "var(--yt-red)";
+                        btn.innerText = "ULANGI TUGAS";
+                        status.innerHTML = "<b style='color:var(--yt-red)'>Gagal!</b> Klik ulang dan pastikan sudah interaksi.";
                         attempt = 2;
                     } else {
                         btn.style.display = "none";
                         status.innerHTML = `
                             <input type="number" id="pinInput" placeholder="Masukkan PIN 4 Digit" maxlength="4">
-                            <button class="btn btn-unlock" onclick="verifyPin('${reqPin}')">BUKA LINK</button>
+                            <button class="btn btn-unlock" onclick="verifyPin('${targetLink}', '${requiredPin}')">BUKA LINK SEKARANG</button>
                         `;
-                        status.style.color = "var(--text)";
                     }
                 }
             }, 1000);
         }
 
-        window.verifyPin = (reqPin) => {
+        window.verifyPin = (target, reqPin) => {
             const input = document.getElementById('pinInput').value;
             const status = document.getElementById('statusMsg');
+            
             if(input === reqPin) {
-                status.innerText = "Berhasil! Mengalihkan...";
+                status.innerText = "PIN Benar! Mengalihkan...";
                 status.style.color = "var(--success)";
-                setTimeout(() => { window.location.href = FINAL_LINK; }, 1500);
+                
+                // --- LOGIKA BYPASS OTOMATIS ---
+                let finalDestination = target;
+                if(target.includes("linkdickynews")) {
+                    // Jika link tujuan adalah Web 2, tambahkan parameter bypass
+                    finalDestination = target + "&method=bypass";
+                }
+
+                setTimeout(() => { window.location.href = finalDestination; }, 1500);
             } else {
-                alert("PIN Salah!");
+                alert("PIN Salah! Cek komentar video lagi.");
             }
         }
     }
