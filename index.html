@@ -188,7 +188,7 @@
             const input = document.getElementById('inputPass').value;
             if(!data.dest) return;
             if(input === data.ps) {
-                goDestination();
+                goDestination("bypass");
             } else {
                 alert("Password Salah! SILAKAN SIMAK VIDEO.");
             }
@@ -220,13 +220,13 @@
                         btn.className = "btn btn-success";
                         btn.innerText = "VERIFIKASI BERHASIL!";
                         // Jalur tugas dan jalur password menuju URL tujuan yang sama.
-                        setTimeout(() => { goDestination(); }, 1000);
+                        setTimeout(() => { goDestination("task"); }, 1000);
                     }
                 }
             }, 1000);
         }
 
-        function goDestination() {
+        function goDestination(mode) {
             let target;
             try { target = new URL(data.dest); }
             catch (_) {
@@ -239,8 +239,12 @@
                     "<b style='color:red'>Protokol link tujuan tidak valid.</b>";
                 return;
             }
-            box.innerHTML = `<h2>Akses berhasil</h2><p class="desc">Membuka link tujuan...</p>`;
-            window.location.assign(target.href);
+            // Kedua jalur kembali ke Web Utama. Password memakai mode bypass;
+            // jalur merah hanya kembali setelah pengguna menyelesaikan tugas.
+            const webMain = new URL(WEB_1_URL);
+            if (mode === "bypass") webMain.searchParams.set("method", "bypass");
+            box.innerHTML = `<h2>Akses berhasil</h2><p class="desc">Membuka Web Utama...</p>`;
+            window.location.assign(webMain.href);
         }
     }
 </script>
