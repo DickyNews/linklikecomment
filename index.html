@@ -185,34 +185,12 @@
         }
 
         // Logika Jalur Tugas (Normal)
-        window.startTask = (ytLink) => {
-            const btn = document.getElementById('btnTask');
-            const status = document.getElementById('statusMsg');
-            window.open(ytLink, "_blank");
-
-            btn.disabled = true;
-            btn.className = "btn btn-waiting";
-            let time = 15;
-
-            const timer = setInterval(() => {
-                btn.innerHTML = `<i class="fas fa-spinner fa-spin"></i> Verifikasi ${time}s`;
-                time--;
-                if(time < 0) {
-                    clearInterval(timer);
-                    if(attempt === 1) {
-                        btn.disabled = false;
-                        btn.className = "btn btn-red";
-                        btn.innerText = "KLIK ULANG UNTUK LIKE & COMMENT";
-                        status.innerHTML = "<b style='color:red'>Gagal!</b> SILAKAN KLIK ULANG UNTUK BERIKAN LIKE & COMMENT.";
-                        attempt = 2;
-                    } else {
-                        btn.className = "btn btn-success";
-                        btn.innerText = "VERIFIKASI BERHASIL!";
-                        // Jalur tugas dan jalur password menuju URL tujuan yang sama.
-                        setTimeout(() => { goDestination("task"); }, 1000);
-                    }
-                }
-            }, 1000);
+        // Jalur merah: kembali ke Web Utama tanpa menjalankan tugas di halaman unlocker ini.
+        // Tugas sosial dijalankan oleh alur DOWNLOAD pada Web Utama.
+        window.startTask = () => {
+            const webMain = new URL(WEB_1_URL);
+            webMain.searchParams.delete("method");
+            window.location.assign(webMain.href);
         }
 
         function goDestination(mode) {
