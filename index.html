@@ -173,8 +173,14 @@
         `;
         // Tombol merah hanya kembali ke Web Utama.
         // Jangan membuka YouTube, membuat timer, atau menjalankan tugas di halaman ini.
-        document.getElementById('btnTask').addEventListener('click', function () {
-            window.location.href = WEB_1_URL;
+        document.getElementById('btnTask').addEventListener('click', function (event) {
+            event.preventDefault();
+            const button = this;
+            button.disabled = true;
+            button.textContent = 'MEMBUKA WEB UTAMA...';
+            // Jalur merah kembali ke Web Utama TANPA bypass.
+            // Tugas sosial baru dimulai dari tombol DOWNLOAD di Web Utama.
+            window.location.assign('https://dickynews.github.io/download/');
         });
 
         // Logika Jalur Password (VIP)
