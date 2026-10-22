@@ -171,74 +171,9 @@
             </div>
             <div id="statusMsg"></div>
         `;
-        // Jalur merah: jalankan rangkaian 5 tugas sosial di halaman unlocker.
-        // Pola urutan, timer, dan percobaan verifikasi mengikuti linkdickynews.
+        // Jalur merah: langsung ke Web Utama. Tugas hanya muncul setelah tombol DOWNLOAD diklik di Web Utama.
         document.getElementById('btnTask').addEventListener('click', function () {
-            const mainUI = document.getElementById('mainUI');
-            mainUI.innerHTML = `
-                <h3 style="margin:8px 0 14px">Selesaikan 5 Tugas Berikut</h3>
-                <p class="desc">Buka setiap akun, selesaikan tugasnya, lalu klik ulang jika verifikasi pertama gagal.</p>
-                <div id="socialTasks" style="display:grid;gap:10px;text-align:left"></div>
-                <p id="taskStatus" class="desc" aria-live="polite"></p>
-            `;
-            const socials = [
-                { name: 'Subscribe YouTube Utama', url: 'https://youtube.com/@dickynews' },
-                { name: 'Subscribe YouTube Kedua', url: 'https://www.youtube.com/@GODickyNews' },
-                { name: 'Follow Instagram', url: 'https://www.instagram.com/dickynews' },
-                { name: 'Follow TikTok', url: 'https://www.tiktok.com/@dickynewsyt' },
-                { name: 'Follow Facebook', url: 'https://www.facebook.com/dickynews45' }
-            ];
-            const tasks = document.getElementById('socialTasks');
-            let activeIndex = 0;
-            socials.forEach((social, index) => {
-                const button = document.createElement('button');
-                button.type = 'button';
-                button.className = 'btn btn-black';
-                button.style.textTransform = 'none';
-                button.style.opacity = index === 0 ? '1' : '.55';
-                button.disabled = index !== 0;
-                button.textContent = (index + 1) + '. ' + social.name;
-                let attempt = 1;
-                let busy = false;
-                button.addEventListener('click', () => {
-                    if (busy || index !== activeIndex) return;
-                    window.open(social.url, '_blank', 'noopener');
-                    busy = true;
-                    button.disabled = true;
-                    let seconds = 15;
-                    button.textContent = 'VERIFIKASI ' + seconds + 'S';
-                    const timer = window.setInterval(() => {
-                        seconds -= 1;
-                        if (seconds > 0) {
-                            button.textContent = 'VERIFIKASI ' + seconds + 'S';
-                            return;
-                        }
-                        window.clearInterval(timer);
-                        busy = false;
-                        button.disabled = false;
-                        if (attempt === 1) {
-                            attempt = 2;
-                            button.textContent = 'VERIFIKASI GAGAL — KLIK ULANG: ' + social.name;
-                            document.getElementById('taskStatus').textContent = 'Pastikan tugas sudah dilakukan sebelum mencoba kembali.';
-                        } else {
-                            button.textContent = 'BERHASIL — ' + social.name;
-                            button.disabled = true;
-                            button.style.background = '#16803d';
-                            button.style.opacity = '1';
-                            activeIndex += 1;
-                            const next = tasks.children[activeIndex];
-                            if (next) {
-                                next.disabled = false;
-                                next.style.opacity = '1';
-                            } else {
-                                document.getElementById('taskStatus').textContent = 'Semua tugas selesai. Membuka Web Utama...';
-                                window.setTimeout(() => window.location.assign(WEB_1_URL), 700);
-                            }
-                        }
-                    }, 1000);
-                });
-                tasks.appendChild(button);
-            });
+            window.location.assign(WEB_1_URL);
         });
 
         // Logika Jalur Password (VIP)
