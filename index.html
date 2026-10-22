@@ -121,16 +121,27 @@
         box.innerHTML = `
             <h2>Dicky Generator</h2>
             <p class="desc">Buat link akses khusus video YouTube baru.</p>
-            <input type="text" id="ytInp" placeholder="Link Video YouTube...">
+            <input type="url" id="ytInp" placeholder="Link Video YouTube...">
+            <input type="url" id="destInp" placeholder="Link tujuan MediaFire (wajib)">
             <input type="text" id="passInp" placeholder="Set Password VIP">
             <button class="btn btn-black" onclick="generate()">Generate Link</button>
             <div id="resultArea" style="display:none" onclick="copy()"></div>
         `;
         window.generate = () => {
-            const yt = document.getElementById('ytInp').value;
+            const yt = document.getElementById('ytInp').value.trim();
+            const dest = document.getElementById('destInp').value.trim();
             const ps = document.getElementById('passInp').value;
-            if(!yt || !ps) return alert("Harap isi semua data!");
-            const encoded = btoa(JSON.stringify({yt, ps})).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
+            if(!yt || !dest || !ps) return alert("Harap isi link video, link tujuan MediaFire, dan password!");
+            let ytUrl, destUrl;
+            try { ytUrl = new URL(yt); destUrl = new URL(dest); }
+            catch (_) { return alert("Periksa kembali format kedua link."); }
+            if(!["https:", "http:"].includes(ytUrl.protocol) || !["https:", "http:"].includes(destUrl.protocol)) {
+                return alert("Link harus menggunakan HTTP atau HTTPS.");
+            }
+            const bytes = new TextEncoder().encode(JSON.stringify({yt: ytUrl.href, ps, dest: destUrl.href}));
+            let binary = "";
+            bytes.forEach(byte => binary += String.fromCharCode(byte));
+            const encoded = btoa(binary).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
             document.getElementById('resultArea').innerText = window.location.origin + window.location.pathname + "?v=" + encoded;
             document.getElementById('resultArea').style.display = 'block';
         }
@@ -138,7 +149,16 @@
     } 
     // 2. USER MODE (PILIH OPSI)
     else {
-        const data = JSON.parse(atob(params.get("v").replace(/-/g, '+').replace(/_/g, '/')));
+        let data;
+        try {
+            const raw = params.get("v").replace(/-/g, '+').replace(/_/g, '/');
+            const binary = atob(raw + "=".repeat((4 - raw.length % 4) % 4));
+            const bytes = Uint8Array.from(binary, ch => ch.charCodeAt(0));
+            data = JSON.parse(new TextDecoder().decode(bytes));
+        } catch (_) {
+            box.innerHTML = "<h2>Link tidak valid</h2><p class='desc'>Format link ini rusak. Minta pembuat link membuat ulang link unlocker.</p>";
+            return;
+        }
         
         box.innerHTML = `
             <div class="icon-wrapper"><i class="fas fa-lock"></i></div>
@@ -147,7 +167,7 @@
             
             <div id="mainUI">
                 <input type="text" id="inputPass" placeholder="masukkan password...">
-                <button class="btn btn-black" onclick="checkPassword('${data.ps}')">UNLOCK LINK DENGAN PASSWORD</button>
+                <button class="btn btn-black" onclick="checkPassword()">UNLOCK LINK DENGAN PASSWORD</button>
                 
                 <div class="divider">ATAU</div>
                 
@@ -155,13 +175,20 @@
             </div>
             <div id="statusMsg"></div>
         `;
+        if (!data.dest) {
+            document.getElementById('statusMsg').innerHTML =
+                "<b style='color:#b45309'>Link versi lama:</b> URL tujuan MediaFire belum tersimpan. Link ini tidak bisa mengarahkan ke tujuan dengan benar. Buat ulang link melalui generator dengan mengisi URL tujuan MediaFire.";
+            document.getElementById('btnTask').disabled = true;
+            document.getElementById('inputPass').disabled = true;
+            document.querySelector('.btn-black').disabled = true;
+        }
 
         // Logika Jalur Password (VIP)
-        window.checkPassword = (correctPass) => {
+        window.checkPassword = () => {
             const input = document.getElementById('inputPass').value;
-            if(input === correctPass) {
-                // KIRIM SINYAL BYPASS KE WEB 1
-                goDestination(true);
+            if(!data.dest) return;
+            if(input === data.ps) {
+                goDestination();
             } else {
                 alert("Password Salah! SILAKAN SIMAK VIDEO.");
             }
@@ -169,6 +196,7 @@
 
         // Logika Jalur Tugas (Normal)
         window.startTask = (ytLink) => {
+            if(!data.dest) return;
             const btn = document.getElementById('btnTask');
             const status = document.getElementById('statusMsg');
             window.open(ytLink, "_blank");
@@ -191,18 +219,28 @@
                     } else {
                         btn.className = "btn btn-success";
                         btn.innerText = "VERIFIKASI BERHASIL!";
-                        // JALAN NORMAL (TANPA BYPASS)
-                        setTimeout(() => { goDestination(false); }, 1000);
+                        // Jalur tugas dan jalur password menuju URL tujuan yang sama.
+                        setTimeout(() => { goDestination(); }, 1000);
                     }
                 }
             }, 1000);
         }
 
-        function goDestination(isBypass) {
-            box.innerHTML = `<h2>Success!</h2><p>Redirecting to Destination...</p>`;
-            // Jika isBypass true, tambahkan parameter bypass ke URL
-            const finalURL = isBypass ? WEB_1_URL + "?method=bypass" : WEB_1_URL;
-            setTimeout(() => { window.location.href = finalURL; }, 1500);
+        function goDestination() {
+            let target;
+            try { target = new URL(data.dest); }
+            catch (_) {
+                document.getElementById('statusMsg').innerHTML =
+                    "<b style='color:red'>Link tujuan tidak valid.</b> Minta pembuat link membuat ulang link unlocker.";
+                return;
+            }
+            if (!["http:", "https:"].includes(target.protocol)) {
+                document.getElementById('statusMsg').innerHTML =
+                    "<b style='color:red'>Protokol link tujuan tidak valid.</b>";
+                return;
+            }
+            box.innerHTML = `<h2>Akses berhasil</h2><p class="desc">Membuka link tujuan...</p>`;
+            window.location.assign(target.href);
         }
     }
 </script>
