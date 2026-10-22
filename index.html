@@ -167,10 +167,13 @@
                 
                 <div class="divider">ATAU</div>
                 
-                <button id="btnTask" class="btn btn-red" onclick="startTask('${data.yt}')">UNLOCK LINK DENGAN BERIKAN LIKE & KOMENTAR PADA VIDEO BERIKUT (TANPA PASSWORD)</button>
+                <button id="btnTask" class="btn btn-red">UNLOCK LINK DENGAN BERIKAN LIKE & KOMENTAR PADA VIDEO BERIKUT (TANPA PASSWORD)</button>
             </div>
             <div id="statusMsg"></div>
         `;
+        // Handler langsung agar tombol merah tidak bergantung pada inline JavaScript.
+        document.getElementById('btnTask').addEventListener('click', () => window.startTask(data.yt));
+
         // Logika Jalur Password (VIP)
         window.checkPassword = () => {
             const input = document.getElementById('inputPass').value;
