@@ -171,8 +171,11 @@
             </div>
             <div id="statusMsg"></div>
         `;
-        // Handler langsung agar tombol merah tidak bergantung pada inline JavaScript.
-        document.getElementById('btnTask').addEventListener('click', () => window.startTask(data.yt));
+        // Tombol merah hanya kembali ke Web Utama.
+        // Jangan membuka YouTube, membuat timer, atau menjalankan tugas di halaman ini.
+        document.getElementById('btnTask').addEventListener('click', function () {
+            window.location.href = WEB_1_URL;
+        });
 
         // Logika Jalur Password (VIP)
         window.checkPassword = () => {
@@ -185,14 +188,6 @@
         }
 
         // Logika Jalur Tugas (Normal)
-        // Jalur merah: kembali ke Web Utama tanpa menjalankan tugas di halaman unlocker ini.
-        // Tugas sosial dijalankan oleh alur DOWNLOAD pada Web Utama.
-        window.startTask = () => {
-            const webMain = new URL(WEB_1_URL);
-            webMain.searchParams.delete("method");
-            window.location.assign(webMain.href);
-        }
-
         function goDestination(mode) {
             // Kedua jalur kembali ke Web Utama. Password memakai mode bypass;
             // jalur merah kembali ke jalur normal. Tujuan MediaFire dipilih oleh tombol DOWNLOAD di Web Utama.
