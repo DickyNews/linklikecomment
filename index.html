@@ -122,7 +122,6 @@
             <h2>Dicky Generator</h2>
             <p class="desc">Buat link akses khusus video YouTube baru.</p>
             <input type="url" id="ytInp" placeholder="Link Video YouTube...">
-            <input type="url" id="destInp" placeholder="Link tujuan MediaFire (wajib)">
             <input type="text" id="passInp" placeholder="Set Password VIP">
             <button class="btn btn-black" onclick="generate()">Generate Link</button>
             <div id="resultArea" style="display:none" onclick="copy()"></div>
@@ -131,14 +130,12 @@
             const yt = document.getElementById('ytInp').value.trim();
             const dest = document.getElementById('destInp').value.trim();
             const ps = document.getElementById('passInp').value;
-            if(!yt || !dest || !ps) return alert("Harap isi link video, link tujuan MediaFire, dan password!");
+            if(!yt || !ps) return alert("Harap isi link video YouTube dan password!");
             let ytUrl, destUrl;
-            try { ytUrl = new URL(yt); destUrl = new URL(dest); }
-            catch (_) { return alert("Periksa kembali format kedua link."); }
-            if(!["https:", "http:"].includes(ytUrl.protocol) || !["https:", "http:"].includes(destUrl.protocol)) {
-                return alert("Link harus menggunakan HTTP atau HTTPS.");
-            }
-            const bytes = new TextEncoder().encode(JSON.stringify({yt: ytUrl.href, ps, dest: destUrl.href}));
+            try { ytUrl = new URL(yt); }
+            catch (_) { return alert("Periksa kembali format link YouTube."); }
+            if(!["https:", "http:"].includes(ytUrl.protocol)) return alert("Link YouTube harus menggunakan HTTP atau HTTPS.");
+            const bytes = new TextEncoder().encode(JSON.stringify({yt: ytUrl.href, ps}));
             let binary = "";
             bytes.forEach(byte => binary += String.fromCharCode(byte));
             const encoded = btoa(binary).replace(/=+$/, '').replace(/\+/g, '-').replace(/\//g, '_');
@@ -175,18 +172,9 @@
             </div>
             <div id="statusMsg"></div>
         `;
-        if (!data.dest) {
-            document.getElementById('statusMsg').innerHTML =
-                "<b style='color:#b45309'>Link versi lama:</b> URL tujuan MediaFire belum tersimpan. Link ini tidak bisa mengarahkan ke tujuan dengan benar. Buat ulang link melalui generator dengan mengisi URL tujuan MediaFire.";
-            document.getElementById('btnTask').disabled = true;
-            document.getElementById('inputPass').disabled = true;
-            document.querySelector('.btn-black').disabled = true;
-        }
-
         // Logika Jalur Password (VIP)
         window.checkPassword = () => {
             const input = document.getElementById('inputPass').value;
-            if(!data.dest) return;
             if(input === data.ps) {
                 goDestination("bypass");
             } else {
@@ -196,7 +184,6 @@
 
         // Logika Jalur Tugas (Normal)
         window.startTask = (ytLink) => {
-            if(!data.dest) return;
             const btn = document.getElementById('btnTask');
             const status = document.getElementById('statusMsg');
             window.open(ytLink, "_blank");
@@ -227,20 +214,8 @@
         }
 
         function goDestination(mode) {
-            let target;
-            try { target = new URL(data.dest); }
-            catch (_) {
-                document.getElementById('statusMsg').innerHTML =
-                    "<b style='color:red'>Link tujuan tidak valid.</b> Minta pembuat link membuat ulang link unlocker.";
-                return;
-            }
-            if (!["http:", "https:"].includes(target.protocol)) {
-                document.getElementById('statusMsg').innerHTML =
-                    "<b style='color:red'>Protokol link tujuan tidak valid.</b>";
-                return;
-            }
             // Kedua jalur kembali ke Web Utama. Password memakai mode bypass;
-            // jalur merah hanya kembali setelah pengguna menyelesaikan tugas.
+            // jalur merah kembali ke jalur normal. Tujuan MediaFire dipilih oleh tombol DOWNLOAD di Web Utama.
             const webMain = new URL(WEB_1_URL);
             if (mode === "bypass") webMain.searchParams.set("method", "bypass");
             box.innerHTML = `<h2>Akses berhasil</h2><p class="desc">Membuka Web Utama...</p>`;
