@@ -128,10 +128,9 @@
         `;
         window.generate = () => {
             const yt = document.getElementById('ytInp').value.trim();
-            const dest = document.getElementById('destInp').value.trim();
             const ps = document.getElementById('passInp').value;
             if(!yt || !ps) return alert("Harap isi link video YouTube dan password!");
-            let ytUrl, destUrl;
+            let ytUrl;
             try { ytUrl = new URL(yt); }
             catch (_) { return alert("Periksa kembali format link YouTube."); }
             if(!["https:", "http:"].includes(ytUrl.protocol)) return alert("Link YouTube harus menggunakan HTTP atau HTTPS.");
