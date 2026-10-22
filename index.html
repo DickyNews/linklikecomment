@@ -157,7 +157,7 @@
             data = JSON.parse(new TextDecoder().decode(bytes));
         } catch (_) {
             box.innerHTML = "<h2>Link tidak valid</h2><p class='desc'>Format link ini rusak. Minta pembuat link membuat ulang link unlocker.</p>";
-            return;
+            data = {};
         }
         
         box.innerHTML = `
